@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Carbon Price Impact Analysis — €150/t CO₂e</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: system-ui, -apple-system, sans-serif; background: #f8f8f6; color: #2c2c2a; padding: 2rem; line-height: 1.6; }
+.container { max-width: 800px; margin: 0 auto; }
+h1 { font-size: 24px; font-weight: 500; margin-bottom: 8px; color: #1B3A5C; }
+.subtitle { font-size: 14px; color: #73726c; margin-bottom: 24px; }
+.kpi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 24px; }
+.kpi { background: #fff; border-radius: 12px; padding: 16px; text-align: center; border: 0.5px solid #e0e0dc; }
+.kpi-label { font-size: 12px; color: #73726c; margin-bottom: 4px; }
+.kpi-value { font-size: 26px; font-weight: 500; }
+.kpi-sub { font-size: 12px; color: #73726c; margin-top: 2px; }
+.danger { color: #C0392B; }
+.success { color: #0F6E56; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 24px; background: #fff; border-radius: 12px; overflow: hidden; border: 0.5px solid #e0e0dc; }
+thead tr { background: #1B3A5C; color: #fff; }
+th { padding: 10px 12px; font-weight: 500; text-align: right; }
+th:first-child { text-align: left; }
+td { padding: 10px 12px; text-align: right; border-bottom: 0.5px solid #e8e8e4; }
+td:first-child { text-align: left; font-weight: 500; }
+tr.highlight { background: #fef2f2; }
+tr.total { border-top: 2px solid #1B3A5C; font-weight: 500; background: #f2f2f0; }
+.badge { display: inline-block; padding: 2px 8px; border-radius: 6px; font-weight: 500; font-size: 12px; }
+.badge-danger { background: #fef2f2; color: #C0392B; }
+.badge-warning { background: #fef9ed; color: #854F0B; }
+.chart-wrap { position: relative; width: 100%; height: 320px; background: #fff; border-radius: 12px; padding: 16px; border: 0.5px solid #e0e0dc; margin-bottom: 24px; }
+.legend { display: flex; flex-wrap: wrap; gap: 16px; font-size: 12px; color: #73726c; justify-content: center; margin-bottom: 16px; }
+.legend span { display: flex; align-items: center; gap: 4px; }
+.dot { width: 10px; height: 10px; border-radius: 2px; }
+.line-dot { width: 24px; height: 2px; }
+.dash-dot { width: 24px; height: 0; border-top: 1.5px dashed #888; }
+.insight { background: #fff; border: 2px solid #2E75B6; border-radius: 12px; padding: 20px; }
+.insight h3 { font-size: 14px; font-weight: 500; margin-bottom: 6px; }
+.insight p { font-size: 13px; color: #5f5e5a; line-height: 1.7; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>Carbon price impact simulation</h1>
+  <p class="subtitle">Scenario: €150 per tonne CO₂e applied across all Scope 1+2 emissions — data from Revenue + Emissions Fabric Data Agents</p>
+
+  <div class="kpi-grid">
+    <div class="kpi">
+      <div class="kpi-label">Total carbon cost</div>
+      <div class="kpi-value danger">€1,581M</div>
+      <div class="kpi-sub">10,540 kt × €150/t</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Portfolio impact</div>
+      <div class="kpi-value danger">6.7%</div>
+      <div class="kpi-sub">of €23.5B total revenue</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">1% intensity reduction</div>
+      <div class="kpi-value success">€15.8M</div>
+      <div class="kpi-sub">annual savings</div>
+    </div>
+  </div>
+
+  <table>
+    <thead>
+      <tr><th>Division</th><th>Revenue</th><th>Emissions</th><th>Carbon cost</th><th>% of revenue</th></tr>
+    </thead>
+    <tbody>
+      <tr class="highlight">
+        <td>E-Mobility</td><td>€5,015M</td><td>2,822 kt</td>
+        <td style="color:#C0392B;font-weight:500">€423M</td>
+        <td><span class="badge badge-danger">8.4%</span></td>
+      </tr>
+      <tr>
+        <td>Powertrain & Chassis</td><td>€8,900M</td><td>4,183 kt</td>
+        <td style="color:#C0392B;font-weight:500">€627M</td>
+        <td><span class="badge badge-danger">7.1%</span></td>
+      </tr>
+      <tr>
+        <td>Vehicle Lifetime Sol.</td><td>€3,038M</td><td>1,125 kt</td>
+        <td style="color:#854F0B;font-weight:500">€169M</td>
+        <td><span class="badge badge-warning">5.6%</span></td>
+      </tr>
+      <tr>
+        <td>Bearings & Industrial</td><td>€6,368M</td><td>2,337 kt</td>
+        <td style="color:#854F0B;font-weight:500">€351M</td>
+        <td><span class="badge badge-warning">5.5%</span></td>
+      </tr>
+      <tr class="total">
+        <td>Portfolio total</td><td>€23,492M</td><td>10,540 kt</td>
+        <td style="color:#C0392B">€1,581M</td>
+        <td><span class="badge badge-danger">6.7%</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="legend">
+    <span><span class="dot" style="background:#BA7517"></span>Carbon cost (€M)</span>
+    <span><span class="line-dot" style="background:#E24B4A"></span>Impact % of revenue</span>
+    <span><span class="dash-dot"></span>Portfolio avg. 6.7%</span>
+  </div>
+
+  <div class="chart-wrap">
+    <canvas id="comboChart"></canvas>
+  </div>
+
+  <div class="insight">
+    <h3>Strategic takeaway</h3>
+    <p>At €150/t, carbon costs consume <strong style="color:#C0392B">€1.58B or 6.7% of portfolio revenue</strong>. E-Mobility faces the steepest relative impact (8.4%), while Powertrain & Chassis carries the largest absolute burden (€627M — 40% of total portfolio carbon cost). Bearings & Industrial is most resilient at 5.5%. Every 1% reduction in portfolio emissions intensity saves approximately <strong style="color:#0F6E56">€15.8M annually</strong>.</p>
+  </div>
+</div>
+
+<script>
+const labels = ['E-Mobility', 'Powertrain & Chassis', 'Vehicle Lifetime Sol.', 'Bearings & Industrial'];
+const costData = [423, 627, 169, 351];
+const pctData = [8.4, 7.1, 5.6, 5.5];
+const barBg = pctData.map(v => v >= 7 ? 'rgba(186,117,23,0.75)' : 'rgba(186,117,23,0.45)');
+const barBorder = pctData.map(v => v >= 7 ? '#854F0B' : '#BA7517');
+
+new Chart(document.getElementById('comboChart'), {
+  type: 'bar',
+  data: {
+    labels,
+    datasets: [
+      {
+        label: 'Carbon cost (€M)',
+        data: costData,
+        backgroundColor: barBg,
+        borderColor: barBorder,
+        borderWidth: 1.5,
+        borderRadius: 6,
+        barPercentage: 0.55,
+        yAxisID: 'y',
+        order: 2
+      },
+      {
+        label: '% of revenue',
+        data: pctData,
+        type: 'line',
+        borderColor: '#E24B4A',
+        backgroundColor: '#E24B4A',
+        borderWidth: 2.5,
+        pointRadius: 6,
+        pointBackgroundColor: '#ffffff',
+        pointBorderColor: '#E24B4A',
+        pointBorderWidth: 2.5,
+        tension: 0.3,
+        yAxisID: 'y1',
+        order: 1
+      }
+    ]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        callbacks: {
+          label: (ctx) => ctx.datasetIndex === 0 ? '€' + ctx.parsed.y + 'M carbon cost' : ctx.parsed.y + '% of revenue'
+        }
+      }
+    },
+    scales: {
+      y: {
+        beginAtZero: true, max: 750,
+        grid: { color: 'rgba(0,0,0,0.05)' },
+        ticks: { color: '#73726c', callback: (v) => '€' + v + 'M' },
+        title: { display: true, text: 'Carbon cost (€M)', color: '#73726c', font: { size: 12 } }
+      },
+      y1: {
+        position: 'right', beginAtZero: true, max: 10,
+        grid: { drawOnChartArea: false },
+        ticks: { color: '#E24B4A', callback: (v) => v + '%' },
+        title: { display: true, text: '% of revenue', color: '#E24B4A', font: { size: 12 } }
+      },
+      x: {
+        grid: { display: false },
+        ticks: { color: '#73726c', maxRotation: 0, autoSkip: false }
+      }
+    }
+  },
+  plugins: [{
+    id: 'avgLine',
+    afterDraw(chart) {
+      const { ctx, scales: { y1 } } = chart;
+      const yPos = y1.getPixelForValue(6.7);
+      ctx.save();
+      ctx.setLineDash([6, 4]);
+      ctx.strokeStyle = 'rgba(0,0,0,0.18)';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(chart.chartArea.left, yPos);
+      ctx.lineTo(chart.chartArea.right, yPos);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.font = '400 11px system-ui, sans-serif';
+      ctx.fillStyle = '#73726c';
+      ctx.textAlign = 'right';
+      ctx.fillText('Portfolio avg: 6.7%', chart.chartArea.right, yPos - 6);
+      ctx.restore();
+    }
+  }]
+});
+</script>
+</body>
+</html>
