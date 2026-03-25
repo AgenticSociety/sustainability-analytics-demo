@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI-Powered Sustainability Analytics — Interactive Demo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600&family=DM+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg-deep: #0c0f13;
+  --bg-panel: #141820;
+  --bg-card: #1a1f2a;
+  --bg-card-hover: #1f2535;
+  --bg-surface: #232a38;
+  --text-bright: #eef0f4;
+  --text-main: #c4c9d4;
+  --text-muted: #6b7280;
+  --text-dim: #4a5060;
+  --accent: #34d399;
+  --accent-dim: rgba(52,211,153,0.12);
+  --accent-glow: rgba(52,211,153,0.25);
+  --blue: #60a5fa;
+  --blue-dim: rgba(96,165,250,0.12);
+  --amber: #fbbf24;
+  --coral: #f87171;
+  --purple: #a78bfa;
+  --border: rgba(255,255,255,0.06);
+  --border-accent: rgba(52,211,153,0.3);
+  --radius: 12px;
+  --radius-sm: 8px;
+  --font: 'DM Sans', system-ui, -apple-system, sans-serif;
+  --mono: 'DM Mono', 'Consolas', monospace;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { font-size: 15px; }
+body { font-family: var(--font); background: var(--bg-deep); color: var(--text-main); overflow: hidden; height: 100vh; }
+
+.layout { display: grid; grid-template-columns: 300px 1fr; height: 100vh; }
+
+/* ---- SIDEBAR ---- */
+.sidebar {
+  background: var(--bg-panel);
+  border-right: 1px solid var(--border);
+  display: flex; flex-direction: column;
+  padding: 0;
+  overflow: hidden;
+}
+
+.sidebar-header {
+  padding: 28px 24px 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+.sidebar-logo {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 16px;
+}
+
+.logo-icon {
+  width: 36px; height: 36px;
+  background: linear-gradient(135deg, var(--accent), #059669);
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; font-weight: 600; color: #fff;
+}
+
+.logo-text {
+  font-size: 14px; font-weight: 500; color: var(--text-bright);
+  line-height: 1.3;
+}
+.logo-text span { display: block; font-size: 11px; color: var(--text-muted); font-weight: 400; }
+
+.sidebar-tags {
+  display: flex; gap: 6px; flex-wrap: wrap;
+}
+.tag {
+  font-size: 10px; font-family: var(--mono);
+  padding: 3px 8px; border-radius: 20px;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+.tag-revenue { border-color: rgba(96,165,250,0.3); color: var(--blue); }
+.tag-emissions { border-color: rgba(251,191,36,0.3); color: var(--amber); }
+
+.beat-list {
+  flex: 1; overflow-y: auto; padding: 16px 12px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--bg-surface) transparent;
+}
+
+.beat-item {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 12px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-bottom: 4px;
+  position: relative;
+}
+.beat-item:hover { background: var(--bg-card); }
+.beat-item.active { background: var(--accent-dim); }
+.beat-item.active .beat-num { background: var(--accent); color: var(--bg-deep); }
+.beat-item.visited .beat-num { background: var(--bg-surface); border-color: var(--accent); color: var(--accent); }
+
+.beat-num {
+  width: 28px; height: 28px; min-width: 28px;
+  border-radius: 50%;
+  background: var(--bg-surface);
+  border: 1.5px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 600; color: var(--text-muted);
+  transition: all 0.3s;
+}
+
+.beat-label {
+  font-size: 12px; color: var(--text-muted); line-height: 1.4;
+  transition: color 0.2s;
+}
+.beat-item.active .beat-label { color: var(--text-bright); }
+.beat-item.visited .beat-label { color: var(--text-main); }
+
+.sidebar-footer {
+  padding: 16px 24px;
+  border-top: 1px solid var(--border);
+  font-size: 11px; color: var(--text-dim); line-height: 1.5;
+}
+.sidebar-footer a { color: var(--accent); text-decoration: none; }
+
+/* ---- MAIN ---- */
+.main {
+  display: flex; flex-direction: column;
+  overflow: hidden;
+  position: relative;
+}
+
+.main-header {
+  padding: 16px 32px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+  background: var(--bg-panel);
+  min-height: 56px;
+}
+
+.header-left {
+  display: flex; align-items: center; gap: 12px;
+}
+
+.beat-counter {
+  font-size: 12px; font-family: var(--mono); color: var(--text-muted);
+}
+.beat-counter strong { color: var(--accent); }
+
+.nav-buttons { display: flex; gap: 8px; }
+.nav-btn {
+  display: flex; align-items: center; gap: 6px;
+  padding: 8px 16px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-muted);
+  font-family: var(--font);
+  font-size: 13px; font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.nav-btn:hover { background: var(--bg-card); color: var(--text-bright); border-color: rgba(255,255,255,0.12); }
+.nav-btn:disabled { opacity: 0.3; cursor: default; }
+.nav-btn:disabled:hover { background: transparent; color: var(--text-muted); }
+.nav-btn-primary {
+  background: var(--accent-dim);
+  border-color: var(--border-accent);
+  color: var(--accent);
+}
+.nav-btn-primary:hover { background: var(--accent-glow); }
+
+.chat-area {
+  flex: 1;
+  overflow-y: auto;
+  padding: 32px;
+  scroll-behavior: smooth;
+  scrollbar-width: thin;
+  scrollbar-color: var(--bg-surface) transparent;
+}
+
+/* ---- CHAT MESSAGES ---- */
+.beat-section {
+  max-width: 820px;
+  margin: 0 auto 48px;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.beat-section.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.user-msg {
+  display: flex; justify-content: flex-end;
+  margin-bottom: 24px;
+}
+.user-bubble {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 20px 20px 4px 20px;
+  padding: 12px 20px;
+  max-width: 520px;
+  font-size: 14px; color: var(--text-bright);
+  line-height: 1.5;
+}
+
+.ai-msg {
+  margin-bottom: 24px;
+}
+
+.ai-avatar {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 12px;
+}
+.avatar-dot {
+  width: 28px; height: 28px;
+  background: linear-gradient(135deg, var(--accent), #059669);
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; font-weight: 600; color: #fff;
+}
+.avatar-name { font-size: 13px; font-weight: 500; color: var(--text-bright); }
+.avatar-name span { color: var(--text-muted); font-weight: 400; margin-left: 6px; }
+
+.ai-text {
+  font-size: 14px; color: var(--text-main); line-height: 1.75;
+  margin-bottom: 16px;
+  padding-left: 38px;
+}
+.ai-text strong { color: var(--text-bright); font-weight: 500; }
+.ai-text .highlight { color: var(--accent); font-weight: 500; }
+.ai-text .highlight-blue { color: var(--blue); font-weight: 500; }
+.ai-text .highlight-amber { color: var(--amber); font-weight: 500; }
+.ai-text .highlight-coral { color: var(--coral); font-weight: 500; }
+
+.agent-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 11px; font-family: var(--mono);
+  padding: 2px 8px; border-radius: 20px;
+  vertical-align: middle;
+}
+.agent-revenue { background: var(--blue-dim); color: var(--blue); border: 1px solid rgba(96,165,250,0.2); }
+.agent-emissions { background: rgba(251,191,36,0.12); color: var(--amber); border: 1px solid rgba(251,191,36,0.2); }
+
+.visual-frame {
+  margin-left: 38px;
+  border-radius: var(--radius);
+  overflow: hidden;
+  border: 1px solid var(--border);
+  background: #fff;
+  position: relative;
+}
+.visual-frame iframe {
+  width: 100%; border: none; display: block;
+  min-height: 400px;
+}
+.visual-label {
+  position: absolute; top: 12px; right: 12px;
+  font-size: 10px; font-family: var(--mono);
+  padding: 3px 10px; border-radius: 20px;
+  background: rgba(0,0,0,0.7); color: rgba(255,255,255,0.7);
+  backdrop-filter: blur(8px);
+  z-index: 2;
+}
+
+/* ---- INTRO HERO ---- */
+.hero {
+  max-width: 620px; margin: 0 auto;
+  text-align: center;
+  padding-top: 10vh;
+}
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 11px; font-family: var(--mono);
+  padding: 5px 14px; border-radius: 20px;
+  border: 1px solid var(--border-accent);
+  color: var(--accent);
+  margin-bottom: 24px;
+}
+.hero-badge::before {
+  content: ''; width: 6px; height: 6px;
+  background: var(--accent); border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+.hero h1 {
+  font-size: 36px; font-weight: 600;
+  color: var(--text-bright);
+  line-height: 1.25;
+  margin-bottom: 16px;
+  letter-spacing: -0.5px;
+}
+.hero h1 em { font-style: normal; color: var(--accent); }
+
+.hero p {
+  font-size: 15px; color: var(--text-muted); line-height: 1.7;
+  margin-bottom: 32px;
+}
+
+.hero-start {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 14px 32px;
+  border-radius: var(--radius);
+  background: var(--accent);
+  color: var(--bg-deep);
+  font-family: var(--font);
+  font-size: 15px; font-weight: 600;
+  border: none; cursor: pointer;
+  transition: all 0.25s;
+}
+.hero-start:hover { transform: translateY(-1px); box-shadow: 0 8px 32px var(--accent-glow); }
+
+.hero-meta {
+  display: flex; justify-content: center; gap: 32px;
+  margin-top: 40px;
+  font-size: 12px; color: var(--text-dim);
+}
+.hero-meta div { display: flex; flex-direction: column; gap: 4px; }
+.hero-meta strong { color: var(--text-muted); font-size: 18px; font-weight: 500; }
+
+/* ---- KEYBOARD HINT ---- */
+.key-hint {
+  position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+  display: flex; gap: 16px; align-items: center;
+  font-size: 11px; color: var(--text-dim);
+  background: var(--bg-panel);
+  padding: 8px 20px; border-radius: 20px;
+  border: 1px solid var(--border);
+  z-index: 100;
+  opacity: 0;
+  transition: opacity 0.5s;
+}
+.key-hint.show { opacity: 1; }
+kbd {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 22px; height: 22px;
+  padding: 0 6px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-family: var(--mono); font-size: 10px;
+  color: var(--text-muted);
+}
+
+/* ---- RESPONSIVE ---- */
+@media (max-width: 900px) {
+  .layout { grid-template-columns: 1fr; }
+  .sidebar { display: none; }
+  .chat-area { padding: 20px 16px; }
+  .visual-frame { margin-left: 0; }
+  .ai-text { padding-left: 0; }
+  .hero h1 { font-size: 28px; }
+}
+</style>
+</head>
+<body>
+
+<div class="layout">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo">
+        <div class="logo-icon">S</div>
+        <div class="logo-text">Sustainability Analytics<span>Conversational AI Demo</span></div>
+      </div>
+      <div class="sidebar-tags">
+        <span class="tag tag-revenue">Revenue Agent</span>
+        <span class="tag tag-emissions">Emissions Agent</span>
+        <span class="tag">Microsoft Fabric</span>
+        <span class="tag">Claude AI</span>
+      </div>
+    </div>
+
+    <div class="beat-list" id="beatList">
+      <div class="beat-item active" data-beat="0">
+        <div class="beat-num">●</div>
+        <div class="beat-label">Start</div>
+      </div>
+      <div class="beat-item" data-beat="1">
+        <div class="beat-num">1</div>
+        <div class="beat-label">Revenue by division</div>
+      </div>
+      <div class="beat-item" data-beat="2">
+        <div class="beat-num">2</div>
+        <div class="beat-label">Biggest vs smallest emitter</div>
+      </div>
+      <div class="beat-item" data-beat="3">
+        <div class="beat-num">3</div>
+        <div class="beat-label">Revenue chart view</div>
+      </div>
+      <div class="beat-item" data-beat="4">
+        <div class="beat-num">4</div>
+        <div class="beat-label">Emissions intensity</div>
+      </div>
+      <div class="beat-item" data-beat="5">
+        <div class="beat-num">4b</div>
+        <div class="beat-label">Why E-Mobility?</div>
+      </div>
+      <div class="beat-item" data-beat="6">
+        <div class="beat-num">5</div>
+        <div class="beat-label">Priority quadrant</div>
+      </div>
+      <div class="beat-item" data-beat="7">
+        <div class="beat-num">6</div>
+        <div class="beat-label">Carbon price impact</div>
+      </div>
+      <div class="beat-item" data-beat="8">
+        <div class="beat-num">7</div>
+        <div class="beat-label">Green revenue ratio</div>
+      </div>
+      <div class="beat-item" data-beat="9">
+        <div class="beat-num">8</div>
+        <div class="beat-label">Cross-cutting use cases</div>
+      </div>
+    </div>
+
+    <div class="sidebar-footer">
+      Powered by <a href="#">Microsoft Fabric</a> Data Agents + <a href="#">Claude AI</a><br>
+      Demo data for illustrative purposes
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <header class="main-header">
+      <div class="header-left">
+        <span class="beat-counter" id="beatCounter"><strong>Start</strong> — Click to begin</span>
+      </div>
+      <div class="nav-buttons">
+        <button class="nav-btn" id="prevBtn" disabled onclick="navigate(-1)">← Back</button>
+        <button class="nav-btn nav-btn-primary" id="nextBtn" onclick="navigate(1)">Next →</button>
+      </div>
+    </header>
+
+    <div class="chat-area" id="chatArea">
+      <!-- Filled by JS -->
+    </div>
+  </main>
+</div>
+
+<div class="key-hint" id="keyHint">
+  <kbd>→</kbd> Next beat
+  <kbd>←</kbd> Previous beat
+  <kbd>Esc</kbd> Reset
+</div>
+
+<script>
+const beats = [
+  // Beat 0: Hero
+  {
+    type: 'hero'
+  },
+  // Beat 1
+  {
+    user: 'Show revenue by division',
+    agents: ['revenue'],
+    text: '<strong>Revenue by Division</strong> — data live from the Fabric Revenue Data Agent. Powertrain & Chassis dominates with <span class="highlight-blue">€8.9B (37.9%)</span>, followed by Bearings & Industrial at <span class="highlight-blue">€6.4B</span>. Together they represent nearly two-thirds of the portfolio.',
+    visual: 'visuals/revenue_by_division_overview.html',
+    height: 520
+  },
+  // Beat 2
+  {
+    user: 'Which division is the biggest emitter and how does it compare to the smallest?',
+    agents: ['emissions'],
+    text: 'Now the <span class="agent-badge agent-emissions">Emissions Agent</span> enters the conversation. <strong>Powertrain & Chassis</strong> is the biggest emitter at <span class="highlight-coral">4,183 kt CO₂e (39.7%)</span>. <strong>Vehicle Lifetime Solutions</strong> is the smallest at <span class="highlight">1,125 kt (10.7%)</span>. Powertrain emits <strong>3.7× more</strong> CO₂ — but generates only 2.9× more revenue. It\'s disproportionately emissions-intensive.',
+    visual: 'visuals/emissions_biggest_vs_smallest.html',
+    height: 560
+  },
+  // Beat 3
+  {
+    user: 'Show me revenue by division as a chart',
+    agents: ['revenue'],
+    text: 'Same data, different perspective — a <strong>donut chart</strong> for portfolio shares and <strong>horizontal bars</strong> for absolute values. The AI agent generates the right visualization based on the question — no pre-built dashboard needed.',
+    visual: 'visuals/revenue_by_division_chart.html',
+    height: 480
+  },
+  // Beat 4
+  {
+    user: 'Show emissions intensity by revenue for all divisions',
+    agents: ['revenue', 'emissions'],
+    text: 'Now it gets interesting — we combine <span class="agent-badge agent-revenue">Revenue Agent</span> + <span class="agent-badge agent-emissions">Emissions Agent</span> to compute a derived metric. <strong>E-Mobility has the highest intensity at <span class="highlight-coral">563 t CO₂e/€M</span></strong> — paradoxically the "green" division. Bearings & Industrial is most efficient at <span class="highlight">367 t/€M</span>. This metric exists in neither dataset — Claude calculates it in real-time.',
+    visual: 'visuals/emissions_intensity_by_division.html',
+    height: 560
+  },
+  // Beat 4b
+  {
+    user: 'Why is E-Mobility\'s intensity so high?',
+    agents: ['revenue', 'emissions'],
+    text: 'The AI doesn\'t just query — it <strong>reasons</strong>. Three structural drivers explain the paradox: energy-intensive scale-up manufacturing, a denominator effect from still-ramping revenue, and grid carbon intensity at production sites. The conclusion: <span class="highlight">this is a growth-stage effect, not a structural flaw</span>.',
+    visual: 'visuals/emobility_intensity_explanation.html',
+    height: 700
+  },
+  // Beat 5
+  {
+    user: 'Show portfolio decarbonization priority quadrant',
+    agents: ['revenue', 'emissions'],
+    text: 'The strategic synthesis — a <strong>priority quadrant</strong> mapping revenue (business materiality) × intensity (decarbonization urgency). Powertrain & Chassis and E-Mobility land in <span class="highlight-coral">Critical Priority</span> — together 59% of revenue but 67% of emissions. <strong>A targeted program for just 2 divisions could shift the entire portfolio trajectory.</strong>',
+    visual: 'visuals/decarbonization_priority_quadrant.html',
+    height: 720
+  },
+  // Beat 6
+  {
+    user: 'If we apply a carbon price of €150 per tonne, what is the cost impact per division as % of revenue?',
+    agents: ['revenue', 'emissions'],
+    text: 'The CFO question — at €150/t CO₂e, the portfolio faces <span class="highlight-coral">€1.58B in carbon costs (6.7% of revenue)</span>. E-Mobility bears the steepest relative impact at <strong>8.4%</strong>, while Powertrain & Chassis carries the largest absolute burden at <strong>€627M</strong>. Every 1% reduction in intensity saves ~€15.8M annually.',
+    visual: 'visuals/carbon_price_impact_150eur.html',
+    height: 660
+  },
+  // Beat 7 (Green Revenue Ratio)
+  {
+    user: 'What percentage of revenue comes from divisions with above-average emissions intensity?',
+    agents: ['revenue', 'emissions'],
+    text: 'A new ESG KPI born from the conversation — the <strong>Green Revenue Ratio</strong>. Only <span class="highlight">40.8%</span> of revenue qualifies as "green" (below-average intensity). <span class="highlight-coral">59.2% comes from above-average divisions</span>. This was never a pre-planned question — it emerged naturally and Claude answered instantly by combining both agents.',
+    visual: 'visuals/green_revenue_ratio.html',
+    height: 720
+  },
+  // Beat 8
+  {
+    user: 'Can you look at what we get from the data agents and think about interesting analytical use cases that cut across the two?',
+    agents: ['revenue', 'emissions'],
+    text: 'The grand finale — Claude inspects both agents\' schemas and proposes a <strong>3-tier roadmap of 12 cross-cutting use cases</strong>. Tier 1 works today, Tier 2 unlocks with enriched Lakehouse data, Tier 3 adds external agents. The key insight: <span class="highlight">the AI layer stays the same — it\'s the data that scales</span>.',
+    visual: 'visuals/cross_cutting_use_cases.html',
+    height: 900
+  }
+];
+
+let currentBeat = 0;
+
+function renderBeat(index) {
+  const area = document.getElementById('chatArea');
+  const beat = beats[index];
+
+  if (beat.type === 'hero') {
+    area.innerHTML = `
+      <div class="beat-section visible">
+        <div class="hero">
+          <div class="hero-badge">Interactive Demo</div>
+          <h1>AI-Powered<br><em>Sustainability Analytics</em></h1>
+          <p>Watch two Microsoft Fabric Data Agents — Revenue and Emissions — come together through Conversational AI. No dashboards. No ETL. Just questions that turn into strategic insights.</p>
+          <button class="hero-start" onclick="navigate(1)">Start the demo →</button>
+          <div class="hero-meta">
+            <div><strong>9</strong>Beats</div>
+            <div><strong>2</strong>Data Agents</div>
+            <div><strong>12</strong>Use Cases</div>
+            <div><strong>1</strong>Conversation</div>
+          </div>
+        </div>
+      </div>`;
+  } else {
+    let agentBadges = '';
+    if (beat.agents.includes('revenue')) agentBadges += '<span class="agent-badge agent-revenue">Revenue Agent</span> ';
+    if (beat.agents.includes('emissions')) agentBadges += '<span class="agent-badge agent-emissions">Emissions Agent</span>';
+
+    area.innerHTML = `
+      <div class="beat-section" id="beatSection">
+        <div class="user-msg">
+          <div class="user-bubble">${beat.user}</div>
+        </div>
+        <div class="ai-msg">
+          <div class="ai-avatar">
+            <div class="avatar-dot">C</div>
+            <div class="avatar-name">Claude <span>${agentBadges}</span></div>
+          </div>
+          <div class="ai-text">${beat.text}</div>
+          <div class="visual-frame">
+            <div class="visual-label">Interactive visualization</div>
+            <iframe src="${beat.visual}" style="height:${beat.height}px" loading="lazy" sandbox="allow-scripts allow-same-origin"></iframe>
+          </div>
+        </div>
+      </div>`;
+
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        document.getElementById('beatSection').classList.add('visible');
+      });
+    });
+  }
+
+  area.scrollTop = 0;
+}
+
+function updateUI() {
+  const items = document.querySelectorAll('.beat-item');
+  items.forEach((item, i) => {
+    item.classList.remove('active', 'visited');
+    if (i === currentBeat) item.classList.add('active');
+    else if (i < currentBeat) item.classList.add('visited');
+  });
+
+  const counter = document.getElementById('beatCounter');
+  if (currentBeat === 0) {
+    counter.innerHTML = '<strong>Start</strong> — Click to begin';
+  } else {
+    counter.innerHTML = `Beat <strong>${currentBeat}</strong> of ${beats.length - 1}`;
+  }
+
+  document.getElementById('prevBtn').disabled = currentBeat === 0;
+  document.getElementById('nextBtn').disabled = currentBeat >= beats.length - 1;
+
+  document.getElementById('keyHint').classList.toggle('show', currentBeat > 0);
+}
+
+function navigate(dir) {
+  const next = currentBeat + dir;
+  if (next < 0 || next >= beats.length) return;
+  currentBeat = next;
+  renderBeat(currentBeat);
+  updateUI();
+}
+
+function goToBeat(index) {
+  currentBeat = index;
+  renderBeat(currentBeat);
+  updateUI();
+}
+
+document.querySelectorAll('.beat-item').forEach(item => {
+  item.addEventListener('click', () => goToBeat(parseInt(item.dataset.beat)));
+});
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); navigate(1); }
+  else if (e.key === 'ArrowLeft') { e.preventDefault(); navigate(-1); }
+  else if (e.key === 'Escape') { goToBeat(0); }
+});
+
+renderBeat(0);
+updateUI();
+</script>
+
+</body>
+</html>
