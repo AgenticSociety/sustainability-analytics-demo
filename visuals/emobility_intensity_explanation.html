@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Why is E-Mobility's Intensity So High?</title>
+<style>
+  :root { --bg:#ffffff; --bg2:#f5f5f3; --t1:#2c2c2a; --t2:#73726c; --bd:#e0ded6; --info-bd:#85b7eb; --info-bg:#e6f1fb; --info-t:#0c447c; --danger-t:#a32d2d; --success-t:#085041; --font:"Segoe UI",system-ui,sans-serif; }
+  @media(prefers-color-scheme:dark){ :root{ --bg:#1a1a18; --bg2:#2c2c2a; --t1:#e0ded6; --t2:#9c9a92; --bd:#444441; --info-bd:#378add; --info-bg:#0a2a45; --info-t:#85b7eb; --danger-t:#f09595; --success-t:#9fe1cb; } }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:var(--font);background:var(--bg);color:var(--t1);padding:2rem;max-width:800px;margin:0 auto}
+  h1{font-size:22px;font-weight:500;margin-bottom:0.5rem}
+  .sub{font-size:13px;color:var(--t2);margin-bottom:1.5rem;line-height:1.6}
+  .paradox{background:var(--bg);border:2px solid var(--info-bd);border-radius:12px;padding:1.25rem;margin-bottom:1.5rem}
+  .paradox-title{font-size:14px;font-weight:500;margin-bottom:8px}
+  .paradox-text{font-size:14px;color:var(--t2);line-height:1.7}
+  .paradox-text strong{color:var(--t1);font-weight:500}
+  .paradox-text .danger{color:var(--danger-t);font-weight:500}
+  .driver{border-radius:12px;padding:1.25rem;margin-bottom:12px}
+  .driver-title{font-size:14px;font-weight:500;margin-bottom:6px}
+  .driver-text{font-size:13px;line-height:1.6}
+  .d1{background:#faece7;color:#712b13} .d1 .driver-title{color:#4a1b0c}
+  .d2{background:#faeeda;color:#633806} .d2 .driver-title{color:#412402}
+  .d3{background:#eeedfe;color:#3c3489} .d3 .driver-title{color:#26215c}
+  @media(prefers-color-scheme:dark){
+    .d1{background:#3a1c10;color:#f5c4b3} .d1 .driver-title{color:#f0997b}
+    .d2{background:#3a2a0a;color:#fac775} .d2 .driver-title{color:#ef9f27}
+    .d3{background:#2a2450;color:#cecbf6} .d3 .driver-title{color:#afa9ec}
+  }
+  .conclusion{background:#e1f5ee;border-radius:12px;padding:1.25rem;margin-top:1.5rem;text-align:center}
+  .conclusion-title{font-size:14px;font-weight:500;color:#085041;margin-bottom:4px}
+  .conclusion-text{font-size:13px;color:#0f6e56}
+  @media(prefers-color-scheme:dark){
+    .conclusion{background:#0a2e24}
+    .conclusion-title{color:#9fe1cb}
+    .conclusion-text{color:#5dcaa5}
+  }
+  .kpis{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:1rem}
+  .kpi{background:var(--bg2);border-radius:8px;padding:1rem}
+  .kpi-label{font-size:12px;color:var(--t2);margin-bottom:4px}
+  .kpi-value{font-size:20px;font-weight:500}
+  .kpi-sub{font-size:12px;color:var(--t2)}
+  .source{font-size:11px;color:var(--t2);margin-top:1.5rem;padding-top:1rem;border-top:0.5px solid var(--bd)}
+</style>
+</head>
+<body>
+<h1>Why is E-Mobility's intensity so high?</h1>
+<p class="sub">E-Mobility contributes 21.4% of revenue but 26.8% of emissions — a 5.4pp gap that makes it the most carbon-intensive division per euro earned.</p>
+
+<div class="paradox">
+  <div class="paradox-title">The E-Mobility paradox</div>
+  <div class="paradox-text">E-Mobility contributes <strong>21.4% of revenue</strong> but <span class="danger">26.8% of emissions</span> — a 5.4 percentage point gap that makes it the most carbon-intensive division per euro earned.</div>
+</div>
+
+<div class="driver d1">
+  <div class="driver-title">1. Energy-intensive manufacturing at scale-up stage</div>
+  <div class="driver-text">Battery component and e-drive production requires high-temperature processes (sintering, coating, cell assembly) — energy demand is front-loaded before economies of scale kick in.</div>
+</div>
+
+<div class="driver d2">
+  <div class="driver-title">2. Revenue still ramping — denominator effect</div>
+  <div class="driver-text">At €5.0B, E-Mobility is growing fast but hasn't reached the revenue density of mature divisions. Fixed emissions from new factories are spread across lower revenue per plant.</div>
+</div>
+
+<div class="driver d3">
+  <div class="driver-title">3. Grid carbon intensity at production sites</div>
+  <div class="driver-text">Scope 2 emissions depend heavily on local electricity grid mix. E-Mobility plants in regions with coal-heavy grids inflate the intensity even if the product itself enables decarbonization.</div>
+</div>
+
+<div class="conclusion">
+  <div class="conclusion-title">Implication: intensity will drop as revenue scales</div>
+  <div class="conclusion-text">This is a growth-stage effect, not a structural flaw</div>
+</div>
+
+<div class="kpis">
+  <div class="kpi">
+    <div class="kpi-label">Revenue share</div>
+    <div class="kpi-value">21.4%</div>
+    <div class="kpi-sub">€5,015M of €23,500M</div>
+  </div>
+  <div class="kpi">
+    <div class="kpi-label">Emissions share</div>
+    <div class="kpi-value" style="color:var(--danger-t)">26.8%</div>
+    <div class="kpi-sub">2,822 kt of 10,540 kt total</div>
+  </div>
+</div>
+
+<p class="source">Source: Fabric Revenue Agent + Fabric Emissions Agent | AI-Powered Sustainability Analytics Demo</p>
+</body>
+</html>

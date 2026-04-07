@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cross-Cutting Analytical Use Cases</title>
+<style>
+  :root { --bg:#ffffff; --bg2:#f5f5f3; --t1:#2c2c2a; --t2:#73726c; --bd:#e0ded6; --font:"Segoe UI",system-ui,sans-serif;
+    --teal-bg:#e1f5ee; --teal-t:#085041; --teal-h:#04342c;
+    --purple-bg:#eeedfe; --purple-t:#3c3489; --purple-h:#26215c;
+    --coral-bg:#faece7; --coral-t:#712b13; --coral-h:#4a1b0c;
+    --info-bd:#85b7eb; --info-bg:#e6f1fb; --info-t:#0c447c;
+    --warn-bg:#faeeda; --warn-t:#633806; }
+  @media(prefers-color-scheme:dark){ :root{ --bg:#1a1a18; --bg2:#2c2c2a; --t1:#e0ded6; --t2:#9c9a92; --bd:#444441;
+    --teal-bg:#0a2e24; --teal-t:#9fe1cb; --teal-h:#5dcaa5;
+    --purple-bg:#2a2450; --purple-t:#cecbf6; --purple-h:#afa9ec;
+    --coral-bg:#3a1c10; --coral-t:#f5c4b3; --coral-h:#f0997b;
+    --info-bd:#378add; --info-bg:#0a2a45; --info-t:#85b7eb;
+    --warn-bg:#3a2a0a; --warn-t:#fac775; } }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:var(--font);background:var(--bg);color:var(--t1);padding:2rem;max-width:800px;margin:0 auto}
+  h1{font-size:22px;font-weight:500;margin-bottom:0.5rem}
+  .sub{font-size:13px;color:var(--t2);margin-bottom:1.5rem;line-height:1.6}
+  .schema{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:1.5rem}
+  .schema-card{border-radius:8px;padding:12px}
+  .schema-rev{background:var(--bg);border:0.5px solid var(--info-bd)}
+  .schema-em{background:var(--bg);border:0.5px solid var(--warn-t)}
+  .schema-label{font-size:12px;font-weight:500;margin-bottom:6px}
+  .schema-fields{font-size:12px;color:var(--t2);line-height:1.6}
+  .schema-fields code{font-family:var(--font-mono,"Consolas",monospace);font-size:11px;background:var(--bg2);padding:1px 4px;border-radius:3px}
+  .schema-note{font-size:12px;color:var(--t2);margin-top:8px;line-height:1.6}
+  .schema-note code{font-family:var(--font-mono,"Consolas",monospace);font-size:11px;background:var(--bg2);padding:1px 4px;border-radius:3px}
+  .tier{margin-bottom:1.5rem}
+  .tier-header{border-radius:8px;padding:10px 16px;margin-bottom:10px;font-size:14px;font-weight:500;text-align:center}
+  .tier-1 .tier-header{background:var(--teal-bg);color:var(--teal-h)}
+  .tier-2 .tier-header{background:var(--purple-bg);color:var(--purple-h)}
+  .tier-3 .tier-header{background:var(--coral-bg);color:var(--coral-h)}
+  .tier-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .uc{border-radius:8px;padding:12px}
+  .tier-1 .uc{background:var(--teal-bg)}
+  .tier-2 .uc{background:var(--purple-bg)}
+  .tier-3 .uc{background:var(--coral-bg)}
+  .uc-title{font-size:13px;font-weight:500;margin-bottom:4px}
+  .uc-text{font-size:12px;line-height:1.5}
+  .tier-1 .uc-title{color:var(--teal-h)} .tier-1 .uc-text{color:var(--teal-t)}
+  .tier-2 .uc-title{color:var(--purple-h)} .tier-2 .uc-text{color:var(--purple-t)}
+  .tier-3 .uc-title{color:var(--coral-h)} .tier-3 .uc-text{color:var(--coral-t)}
+  .roadmap{display:flex;align-items:center;gap:8px;margin:1.5rem 0;font-size:12px;color:var(--t2)}
+  .roadmap-line{flex:1;height:2px;background:var(--bd);position:relative}
+  .roadmap-line::after{content:'';position:absolute;right:0;top:-4px;border:5px solid transparent;border-left:8px solid var(--t2)}
+  .summary{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:1rem}
+  .sum-card{background:var(--bg);border:0.5px solid var(--bd);border-radius:12px;padding:1rem}
+  .sum-label{font-size:12px;font-weight:500;margin-bottom:4px}
+  .sum-value{font-size:20px;font-weight:500}
+  .sum-sub{font-size:12px;color:var(--t2)}
+  .insight{background:var(--bg);border:2px solid var(--info-bd);border-radius:12px;padding:1.25rem;margin-top:1rem}
+  .insight-title{font-size:14px;font-weight:500;margin-bottom:6px}
+  .insight-text{font-size:13px;color:var(--t2);line-height:1.7}
+  .insight-text strong{color:var(--t1);font-weight:500}
+  .source{font-size:11px;color:var(--t2);margin-top:1.5rem;padding-top:1rem;border-top:0.5px solid var(--bd)}
+</style>
+</head>
+<body>
+<h1>Cross-cutting analytical use cases</h1>
+<p class="sub">Three tiers: what works today with current agents, with enriched Lakehouse data, and with external data agents.</p>
+
+<div class="schema">
+  <div class="schema-card schema-rev">
+    <div class="schema-label" style="color:var(--info-t)">REVENUE AGENT</div>
+    <div class="schema-fields"><code>division_id</code>, <code>name</code>, <code>abbrev</code>, <code>revenue_eur_m</code>, <code>revenue_share</code></div>
+  </div>
+  <div class="schema-card schema-em">
+    <div class="schema-label" style="color:var(--warn-t)">EMISSIONS AGENT</div>
+    <div class="schema-fields"><code>division_id</code>, <code>name</code>, <code>abbrev</code>, <code>total_ghg_market_tco2e</code>, <code>emission_share</code></div>
+  </div>
+</div>
+<div class="schema-note">Join key: <code>division_id</code> — current granularity is division-level, single snapshot (no time series, no sub-segments).</div>
+
+<div class="tier tier-1" style="margin-top:1.5rem">
+  <div class="tier-header">Tier 1 — Available today with current agents</div>
+  <div class="tier-grid">
+    <div class="uc"><div class="uc-title">1. Emissions intensity ranking</div><div class="uc-text">t CO₂e per €M revenue — identifies which divisions earn most carbon-efficiently</div></div>
+    <div class="uc"><div class="uc-title">2. Carbon price stress test</div><div class="uc-text">Simulate €50–300/t scenarios to quantify margin erosion per division</div></div>
+    <div class="uc"><div class="uc-title">3. Portfolio priority matrix</div><div class="uc-text">Revenue × intensity quadrant for decarbonization capital allocation</div></div>
+    <div class="uc"><div class="uc-title">4. Green revenue ratio</div><div class="uc-text">% of revenue from below-average intensity divisions — ESG KPI</div></div>
+  </div>
+</div>
+
+<div class="tier tier-2">
+  <div class="tier-header">Tier 2 — Unlocked by enriching the Lakehouse</div>
+  <div class="tier-grid">
+    <div class="uc"><div class="uc-title">5. Decoupling analysis</div><div class="uc-text">Add time series → track if revenue grows faster than emissions (absolute vs. relative decoupling)</div></div>
+    <div class="uc"><div class="uc-title">6. Scope 1/2/3 waterfall</div><div class="uc-text">Add scope breakdown → identify PPA vs. process optimization levers per division</div></div>
+    <div class="uc"><div class="uc-title">7. Facility-level hotspot map</div><div class="uc-text">Add plant/country data → geo-map of emission hotspots vs. revenue contribution per site</div></div>
+    <div class="uc"><div class="uc-title">8. Product carbon footprint</div><div class="uc-text">Add product-group revenue → PCF per bearing, per e-drive, per aftermarket part</div></div>
+  </div>
+</div>
+
+<div class="tier tier-3">
+  <div class="tier-header">Tier 3 — With external data agents</div>
+  <div class="tier-grid">
+    <div class="uc"><div class="uc-title">9. CBAM exposure calculator</div><div class="uc-text">+ EU tariff rates agent → auto-calculate border adjustment costs by division and trade flow</div></div>
+    <div class="uc"><div class="uc-title">10. Peer benchmarking</div><div class="uc-text">+ industry data agent → compare intensity vs. competitors (SKF, Continental, Nidec, ZF)</div></div>
+    <div class="uc"><div class="uc-title">11. SBTi pathway tracker</div><div class="uc-text">+ SBTi target agent → visualize actual trajectory vs. 1.5°C pathway per division</div></div>
+    <div class="uc"><div class="uc-title">12. Grid decarbonization ROI</div><div class="uc-text">+ energy market agent → model PPA cost vs. carbon cost savings by plant location</div></div>
+  </div>
+</div>
+
+<div class="roadmap">
+  <span>Today</span>
+  <div class="roadmap-line"></div>
+  <span>+ Time, Scope, Facility</span>
+  <div class="roadmap-line"></div>
+  <span>+ External agents</span>
+  <div class="roadmap-line"></div>
+</div>
+
+<div class="summary">
+  <div class="sum-card"><div class="sum-label" style="color:var(--teal-t)">TIER 1 — TODAY</div><div class="sum-value">4 use cases</div><div class="sum-sub">Intensity, stress test, quadrant, green ratio</div></div>
+  <div class="sum-card"><div class="sum-label" style="color:var(--purple-t)">TIER 2 — ENRICHED</div><div class="sum-value">4 use cases</div><div class="sum-sub">Decoupling, scope waterfall, hotspots, PCF</div></div>
+  <div class="sum-card"><div class="sum-label" style="color:var(--coral-t)">TIER 3 — EXTERNAL</div><div class="sum-value">4 use cases</div><div class="sum-sub">CBAM, peers, SBTi, grid ROI</div></div>
+</div>
+
+<div class="insight">
+  <div class="insight-title">The key insight</div>
+  <div class="insight-text">
+    The AI layer doesn't need to change — it's the <strong>data that scales</strong>. Every new dimension added to the Fabric Lakehouse (time series, scope breakdown, facility, product group) unlocks exponentially more cross-cutting questions through the same conversational interface. The investment is in <strong>AI-ready data</strong>, not in new dashboards.
+  </div>
+</div>
+
+<p class="source">Source: Fabric Revenue Agent + Fabric Emissions Agent | AI-Powered Sustainability Analytics Demo</p>
+</body>
+</html>

@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Green Revenue Ratio</title>
+<style>
+  :root { --bg:#ffffff; --bg2:#f5f5f3; --t1:#2c2c2a; --t2:#73726c; --bd:#e0ded6; --font:"Segoe UI",system-ui,sans-serif;
+    --danger-bg:#fcebeb; --danger-t:#a32d2d; --success-bg:#e1f5ee; --success-t:#085041; --info-bd:#85b7eb; --info-bg:#e6f1fb; --info-t:#0c447c; }
+  @media(prefers-color-scheme:dark){ :root{ --bg:#1a1a18; --bg2:#2c2c2a; --t1:#e0ded6; --t2:#9c9a92; --bd:#444441;
+    --danger-bg:#3a1a1a; --danger-t:#f09595; --success-bg:#0a2e24; --success-t:#9fe1cb; --info-bd:#378add; --info-bg:#0a2a45; --info-t:#85b7eb; } }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:var(--font);background:var(--bg);color:var(--t1);padding:2rem;max-width:800px;margin:0 auto}
+  h1{font-size:22px;font-weight:500;margin-bottom:0.5rem}
+  .sub{font-size:13px;color:var(--t2);margin-bottom:1.5rem;line-height:1.6}
+  .kpis{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:1.5rem}
+  .kpi{background:var(--bg2);border-radius:8px;padding:1rem;text-align:center}
+  .kpi-label{font-size:12px;color:var(--t2);margin-bottom:4px}
+  .kpi-value{font-size:24px;font-weight:500}
+  .kpi-sub{font-size:12px;color:var(--t2)}
+  .stack-wrap{position:relative;width:100%;height:60px;margin-bottom:1.5rem}
+  .legend{display:flex;flex-wrap:wrap;gap:16px;margin-bottom:1.5rem;font-size:12px;color:var(--t2);justify-content:center}
+  .legend span{display:flex;align-items:center;gap:4px}
+  .dot{width:10px;height:10px;border-radius:2px}
+  .split{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:1.5rem}
+  .split-card{background:var(--bg);border-radius:12px;padding:1rem}
+  .split-danger{border:0.5px solid var(--danger-t)}
+  .split-success{border:0.5px solid var(--success-t)}
+  .split-label{font-size:12px;font-weight:500;margin-bottom:8px}
+  .div-row{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px}
+  .div-name{font-size:13px;font-weight:500}
+  .div-val{font-size:13px;font-weight:500}
+  .div-sub{font-size:12px;color:var(--t2);margin-bottom:10px}
+  .chart-wrap{position:relative;width:100%;height:280px}
+  .insight{background:var(--bg);border:2px solid var(--info-bd);border-radius:12px;padding:1.25rem;margin-top:1rem}
+  .insight-title{font-size:14px;font-weight:500;margin-bottom:6px}
+  .insight-text{font-size:13px;color:var(--t2);line-height:1.7}
+  .insight-text strong{color:var(--t1);font-weight:500}
+  .insight-text .danger{color:var(--danger-t);font-weight:500}
+  .insight-text .success{color:var(--success-t);font-weight:500}
+  .source{font-size:11px;color:var(--t2);margin-top:1.5rem;padding-top:1rem;border-top:0.5px solid var(--bd)}
+</style>
+</head>
+<body>
+<h1>Green revenue ratio</h1>
+<p class="sub">What percentage of revenue comes from divisions with above-average emissions intensity? A portfolio-level ESG KPI derived from both Data Agents.</p>
+
+<div class="kpis">
+  <div class="kpi">
+    <div class="kpi-label">Portfolio avg. intensity</div>
+    <div class="kpi-value">448 t/€M</div>
+    <div class="kpi-sub">10,540 kt ÷ €23.5B</div>
+  </div>
+  <div class="kpi">
+    <div class="kpi-label">Above-average intensity</div>
+    <div class="kpi-value" style="color:var(--danger-t)">59.2%</div>
+    <div class="kpi-sub">€13,915M of revenue</div>
+  </div>
+  <div class="kpi">
+    <div class="kpi-label">Below-average intensity</div>
+    <div class="kpi-value" style="color:var(--success-t)">40.8%</div>
+    <div class="kpi-sub">€9,577M of revenue</div>
+  </div>
+</div>
+
+<div class="stack-wrap"><canvas id="stack"></canvas></div>
+
+<div class="legend">
+  <span><span class="dot" style="background:#A32D2D"></span>Above avg. intensity (59.2%)</span>
+  <span><span class="dot" style="background:#0F6E56"></span>Below avg. intensity (40.8%)</span>
+</div>
+
+<div class="split">
+  <div class="split-card split-danger">
+    <div class="split-label" style="color:var(--danger-t)">ABOVE AVERAGE (>448 t/€M)</div>
+    <div class="div-row"><span class="div-name">Powertrain & Chassis</span><span class="div-val" style="color:var(--danger-t)">470 t/€M</span></div>
+    <div class="div-sub">€8,900M revenue (37.9%)</div>
+    <div class="div-row"><span class="div-name">E-Mobility</span><span class="div-val" style="color:var(--danger-t)">563 t/€M</span></div>
+    <div class="div-sub">€5,015M revenue (21.4%)</div>
+  </div>
+  <div class="split-card split-success">
+    <div class="split-label" style="color:var(--success-t)">BELOW AVERAGE (<448 t/€M)</div>
+    <div class="div-row"><span class="div-name">Vehicle Lifetime Sol.</span><span class="div-val" style="color:var(--success-t)">370 t/€M</span></div>
+    <div class="div-sub">€3,038M revenue (12.9%)</div>
+    <div class="div-row"><span class="div-name">Bearings & Industrial</span><span class="div-val" style="color:var(--success-t)">367 t/€M</span></div>
+    <div class="div-sub">€6,368M revenue (27.1%)</div>
+    <div class="div-row"><span class="div-name">Others</span><span class="div-val" style="color:var(--success-t)">427 t/€M</span></div>
+    <div class="div-sub">€171M revenue (0.7%)</div>
+  </div>
+</div>
+
+<div class="chart-wrap"><canvas id="intBar"></canvas></div>
+
+<div class="insight">
+  <div class="insight-title">Green revenue ratio: 40.8%</div>
+  <div class="insight-text">
+    <span class="danger">59.2% of portfolio revenue</span> comes from divisions with above-average emissions intensity. Only <span class="success">40.8%</span> qualifies as "green revenue." This KPI could be tracked over time — the goal: shift the bar from red to green as E-Mobility scales and Powertrain decarbonizes.
+  </div>
+</div>
+
+<p class="source">Source: Fabric Revenue Agent + Fabric Emissions Agent | AI-Powered Sustainability Analytics Demo</p>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+var dk=matchMedia('(prefers-color-scheme:dark)').matches;
+var gc=dk?'rgba(255,255,255,0.06)':'rgba(0,0,0,0.06)';
+var tc=dk?'#9c9a92':'#73726c';
+var dc=dk?'rgba(255,255,255,0.25)':'rgba(0,0,0,0.2)';
+
+new Chart(document.getElementById('stack'),{
+  type:'bar',
+  data:{labels:['Revenue split'],datasets:[
+    {label:'Above avg.',data:[59.2],backgroundColor:'#A32D2D99',borderColor:'#A32D2D',borderWidth:1,borderSkipped:false},
+    {label:'Below avg.',data:[40.8],backgroundColor:'#0F6E5699',borderColor:'#0F6E56',borderWidth:1,borderSkipped:false}
+  ]},
+  options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{display:false},tooltip:{callbacks:{label:function(c){return c.dataset.label+': '+c.parsed.x+'%';}}}},scales:{x:{stacked:true,max:100,display:false},y:{stacked:true,display:false}}}
+});
+
+var labels=['E-Mobility','Powertrain\n& Chassis','Others','Vehicle\nLifetime Sol.','Bearings\n& Industrial'];
+var intensity=[563,470,427,370,367];
+var barC=intensity.map(function(v){return v>448?'#A32D2D99':'#0F6E5699';});
+var borC=intensity.map(function(v){return v>448?'#A32D2D':'#0F6E56';});
+
+new Chart(document.getElementById('intBar'),{
+  type:'bar',
+  data:{labels:labels,datasets:[{data:intensity,backgroundColor:barC,borderColor:borC,borderWidth:1.5,borderRadius:6,barPercentage:0.6}]},
+  options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',
+    plugins:{legend:{display:false},tooltip:{callbacks:{label:function(c){return c.parsed.x+' t CO\u2082e per \u20ACM revenue';}}}},
+    scales:{x:{beginAtZero:true,max:650,grid:{color:gc},ticks:{color:tc,callback:function(v){return v+' t/\u20ACM';}},title:{display:true,text:'Emissions intensity (t CO\u2082e / \u20ACM revenue)',color:tc,font:{size:12}}},
+      y:{grid:{display:false},ticks:{color:tc,autoSkip:false}}}
+  },
+  plugins:[{id:'avg',afterDraw:function(ch){
+    var ctx=ch.ctx,x=ch.scales.x,y=ch.scales.y,xp=x.getPixelForValue(448);
+    ctx.save();ctx.setLineDash([6,4]);ctx.strokeStyle=dc;ctx.lineWidth=1.5;
+    ctx.beginPath();ctx.moveTo(xp,y.top);ctx.lineTo(xp,y.bottom);ctx.stroke();ctx.setLineDash([]);
+    ctx.font='400 11px "Segoe UI",system-ui,sans-serif';ctx.fillStyle=tc;ctx.textAlign='center';
+    ctx.fillText('Avg: 448 t/\u20ACM',xp,y.top-6);ctx.restore();
+  }}]
+});
+</script>
+</body>
+</html>

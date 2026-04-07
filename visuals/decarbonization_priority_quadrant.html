@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Portfolio Decarbonization Priority Quadrant</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: system-ui, -apple-system, sans-serif; background: #fafaf8; color: #2c2c2a; padding: 2rem; max-width: 900px; margin: 0 auto; }
+  .header { margin-bottom: 1.5rem; }
+  .header h1 { font-size: 22px; font-weight: 500; margin-bottom: 6px; }
+  .header p { font-size: 13px; color: #73726c; line-height: 1.6; }
+  .chart-wrap { position: relative; width: 100%; height: 460px; margin-bottom: 1rem; }
+  .legend { display: flex; flex-wrap: wrap; gap: 16px; font-size: 12px; color: #73726c; justify-content: center; margin-bottom: 1.5rem; }
+  .legend span { display: flex; align-items: center; gap: 4px; }
+  .legend .dot { width: 12px; height: 12px; border-radius: 50%; }
+  .cards { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .card { background: #fff; border: 1px solid #e8e7e3; border-radius: 12px; padding: 1rem; }
+  .card-label { font-size: 12px; font-weight: 500; margin-bottom: 4px; }
+  .card-label.critical { color: #A32D2D; }
+  .card-label.protect { color: #0F6E56; }
+  .card-label.watch { color: #BA7517; }
+  .card-label.maintain { color: #73726c; }
+  .card p { font-size: 13px; color: #73726c; line-height: 1.6; }
+  .card strong { color: #2c2c2a; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Portfolio decarbonization priority quadrant</h1>
+  <p>X-axis: revenue (business materiality) | Y-axis: emissions intensity in t CO₂e/€M (decarbonization urgency) | Bubble size: absolute emissions. Data live from Fabric Revenue Agent + Emissions Agent.</p>
+</div>
+
+<div class="chart-wrap">
+  <canvas id="qChart"></canvas>
+</div>
+
+<div class="legend">
+  <span><span class="dot" style="background:#534AB7"></span>Powertrain & Chassis (470 t/€M · 4,183 kt)</span>
+  <span><span class="dot" style="background:#BA7517"></span>E-Mobility (563 t/€M · 2,822 kt)</span>
+  <span><span class="dot" style="background:#185FA5"></span>Bearings & Industrial (367 t/€M · 2,337 kt)</span>
+  <span><span class="dot" style="background:#0F6E56"></span>Vehicle Lifetime Sol. (370 t/€M · 1,125 kt)</span>
+</div>
+
+<div class="cards">
+  <div class="card">
+    <div class="card-label critical">CRITICAL PRIORITY</div>
+    <p><strong>Powertrain & Chassis + E-Mobility</strong> — high intensity, high materiality. Together 59% of revenue, 67% of emissions. Biggest decarbonization lever for the portfolio.</p>
+  </div>
+  <div class="card">
+    <div class="card-label protect">PROTECT & OPTIMIZE</div>
+    <p><strong>Bearings & Industrial</strong> — €6.4B revenue with lowest intensity (367 t/€M). Protect margins, optimize incrementally.</p>
+  </div>
+  <div class="card">
+    <div class="card-label watch">WATCH & TRANSFORM</div>
+    <p>No current divisions in this quadrant. Monitor for divisions that shrink in revenue while retaining high emissions footprint.</p>
+  </div>
+  <div class="card">
+    <div class="card-label maintain">MAINTAIN</div>
+    <p><strong>Vehicle Lifetime Solutions</strong> — moderate intensity (370 t/€M), smaller revenue (€3B). Continue existing efficiency programs.</p>
+  </div>
+</div>
+
+<script>
+var ds = [
+  {l:'Powertrain & Chassis',x:8900,y:470,r:32,c:'#534AB7',e:4183},
+  {l:'E-Mobility',x:5015,y:563,r:26,c:'#BA7517',e:2822},
+  {l:'Bearings & Industrial',x:6368,y:367,r:24,c:'#185FA5',e:2337},
+  {l:'Vehicle Lifetime Sol.',x:3038,y:370,r:18,c:'#0F6E56',e:1125}
+];
+var tC='#73726c', gC='rgba(0,0,0,0.06)', dC='rgba(0,0,0,0.1)', qL='rgba(0,0,0,0.07)';
+var midX=5500, midY=440;
+
+new Chart(document.getElementById('qChart'),{
+  type:'bubble',
+  data:{datasets:ds.map(function(d){return{label:d.l,data:[{x:d.x,y:d.y,r:d.r}],backgroundColor:d.c+'88',borderColor:d.c,borderWidth:2,hoverRadius:3}})},
+  options:{
+    responsive:true,maintainAspectRatio:false,
+    layout:{padding:{top:28,right:24,bottom:10,left:10}},
+    plugins:{legend:{display:false},tooltip:{callbacks:{label:function(ctx){var d=ds[ctx.datasetIndex];return[d.l,'Revenue: \u20AC'+d.x.toLocaleString()+'M','Intensity: '+d.y+' t CO\u2082e/\u20ACM','Emissions: '+d.e.toLocaleString()+' kt CO\u2082e']}}}},
+    scales:{
+      x:{min:1500,max:10500,grid:{color:gC},ticks:{color:tC,callback:function(v){return'\u20AC'+(v/1000).toFixed(0)+'B'}},title:{display:true,text:'Revenue (business materiality) \u2192',color:tC,font:{size:12}}},
+      y:{min:280,max:640,grid:{color:gC},ticks:{color:tC,callback:function(v){return v+' t/\u20ACM'}},title:{display:true,text:'\u2191 Emissions intensity (decarbonization urgency)',color:tC,font:{size:12}}}
+    }
+  },
+  plugins:[{
+    id:'quad',beforeDraw:function(ch){
+      var ctx=ch.ctx,xs=ch.scales.x,ys=ch.scales.y;
+      var mx=xs.getPixelForValue(midX),my=ys.getPixelForValue(midY);
+      var l=ch.chartArea.left,r=ch.chartArea.right,t=ch.chartArea.top,b=ch.chartArea.bottom;
+      ctx.save();ctx.setLineDash([6,4]);ctx.strokeStyle=dC;ctx.lineWidth=1;
+      ctx.beginPath();ctx.moveTo(mx,t);ctx.lineTo(mx,b);ctx.stroke();
+      ctx.beginPath();ctx.moveTo(l,my);ctx.lineTo(r,my);ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.font='500 11px system-ui,sans-serif';ctx.fillStyle=qL;ctx.textAlign='center';
+      ctx.fillText('WATCH & TRANSFORM',(l+mx)/2,(t+my)/2+4);
+      ctx.fillText('CRITICAL PRIORITY',(mx+r)/2,(t+my)/2+4);
+      ctx.fillText('MAINTAIN',(l+mx)/2,(my+b)/2+4);
+      ctx.fillText('PROTECT & OPTIMIZE',(mx+r)/2,(my+b)/2+4);
+      ctx.restore();
+    }
+  },{
+    id:'lbl',afterDraw:function(ch){
+      var ctx=ch.ctx; ctx.save();
+      var ofs=[-42,-36,34,28];
+      ds.forEach(function(d,i){
+        var pt=ch.getDatasetMeta(i).data[0]; if(!pt) return;
+        ctx.font='500 12px system-ui,sans-serif';ctx.fillStyle='#2c2c2a';ctx.textAlign='center';
+        ctx.fillText(d.l,pt.x,pt.y+ofs[i]);
+        ctx.font='400 11px system-ui,sans-serif';ctx.fillStyle='#73726c';
+        ctx.fillText(d.y+' t/\u20ACM \u00B7 '+d.e.toLocaleString()+' kt',pt.x,pt.y+ofs[i]+15);
+      });
+      ctx.restore();
+    }
+  }]
+});
+</script>
+</body>
+</html>

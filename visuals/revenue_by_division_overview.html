@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Revenue by Division Overview</title>
+<style>
+  :root {
+    --bg-primary: #ffffff;
+    --bg-secondary: #f5f5f3;
+    --text-primary: #2c2c2a;
+    --text-secondary: #73726c;
+    --border: #e0ded6;
+    --font: "Segoe UI", system-ui, -apple-system, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg-primary: #1a1a18;
+      --bg-secondary: #2c2c2a;
+      --text-primary: #e0ded6;
+      --text-secondary: #9c9a92;
+      --border: #444441;
+    }
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: var(--font); background: var(--bg-primary); color: var(--text-primary); padding: 2rem; max-width: 800px; margin: 0 auto; }
+  h1 { font-size: 22px; font-weight: 500; margin-bottom: 0.5rem; }
+  .subtitle { font-size: 13px; color: var(--text-secondary); margin-bottom: 1.5rem; line-height: 1.6; }
+  .cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 1.5rem; }
+  .card { background: var(--bg-secondary); border-radius: 8px; padding: 1rem; }
+  .card-label { font-size: 13px; color: var(--text-secondary); margin-bottom: 4px; }
+  .card-value { font-size: 22px; font-weight: 500; }
+  .card-sub { font-size: 12px; color: var(--text-secondary); }
+  .legend { display: flex; flex-wrap: wrap; gap: 16px; margin-bottom: 8px; font-size: 12px; color: var(--text-secondary); }
+  .legend span { display: flex; align-items: center; gap: 4px; }
+  .legend-dot { width: 10px; height: 10px; border-radius: 2px; }
+  .chart-wrap { position: relative; width: 100%; height: 320px; margin-top: 0.5rem; }
+  .source { font-size: 11px; color: var(--text-secondary); margin-top: 1.5rem; padding-top: 1rem; border-top: 0.5px solid var(--border); }
+</style>
+</head>
+<body>
+
+<h1>Revenue by division</h1>
+<p class="subtitle">Portfolio overview — data from Microsoft Fabric Revenue Data Agent. Total revenue: <strong>€23.5B</strong> across 5 divisions.</p>
+
+<div class="cards">
+  <div class="card">
+    <div class="card-label">Powertrain & Chassis</div>
+    <div class="card-value">€8,900M</div>
+    <div class="card-sub">37.9%</div>
+  </div>
+  <div class="card">
+    <div class="card-label">Bearings & Industrial</div>
+    <div class="card-value">€6,368M</div>
+    <div class="card-sub">27.1%</div>
+  </div>
+  <div class="card">
+    <div class="card-label">E-Mobility</div>
+    <div class="card-value">€5,015M</div>
+    <div class="card-sub">21.4%</div>
+  </div>
+  <div class="card">
+    <div class="card-label">Vehicle Lifetime Sol.</div>
+    <div class="card-value">€3,038M</div>
+    <div class="card-sub">12.9%</div>
+  </div>
+</div>
+
+<div class="legend">
+  <span><span class="legend-dot" style="background:#534AB7"></span>Powertrain & Chassis €8,900M</span>
+  <span><span class="legend-dot" style="background:#185FA5"></span>Bearings & Industrial €6,368M</span>
+  <span><span class="legend-dot" style="background:#BA7517"></span>E-Mobility €5,015M</span>
+  <span><span class="legend-dot" style="background:#0F6E56"></span>Vehicle Lifetime Sol. €3,038M</span>
+</div>
+
+<div class="chart-wrap">
+  <canvas id="revChart"></canvas>
+</div>
+
+<p class="source">Source: Fabric Revenue Data Agent | AI-Powered Sustainability Analytics Demo | Generated via Conversational AI</p>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+const gridC = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)';
+const tickC = isDark ? '#9c9a92' : '#73726c';
+
+new Chart(document.getElementById('revChart'), {
+  type: 'bar',
+  data: {
+    labels: ['Powertrain & Chassis', 'Bearings & Industrial', 'E-Mobility', 'Vehicle Lifetime Sol.'],
+    datasets: [{
+      label: 'Revenue (€M)',
+      data: [8900, 6368, 5015, 3038],
+      backgroundColor: ['#534AB7', '#185FA5', '#BA7517', '#0F6E56'],
+      borderRadius: 6,
+      barPercentage: 0.7
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        callbacks: {
+          label: function(ctx) {
+            return '€' + ctx.parsed.y.toLocaleString() + 'M';
+          }
+        }
+      }
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        grid: { color: gridC },
+        ticks: {
+          color: tickC,
+          callback: function(v) { return '€' + (v / 1000).toFixed(0) + 'B'; }
+        }
+      },
+      x: {
+        grid: { display: false },
+        ticks: { color: tickC, maxRotation: 0 }
+      }
+    }
+  }
+});
+</script>
+
+</body>
+</html>

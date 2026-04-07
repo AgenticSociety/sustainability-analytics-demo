@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Emissions — Biggest vs Smallest Emitter</title>
+<style>
+  :root {
+    --bg-primary: #ffffff;
+    --bg-secondary: #f5f5f3;
+    --text-primary: #2c2c2a;
+    --text-secondary: #73726c;
+    --border: #e0ded6;
+    --danger-bg: #fcebeb;
+    --danger-text: #a32d2d;
+    --success-bg: #e1f5ee;
+    --success-text: #085041;
+    --font: "Segoe UI", system-ui, -apple-system, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg-primary: #1a1a18;
+      --bg-secondary: #2c2c2a;
+      --text-primary: #e0ded6;
+      --text-secondary: #9c9a92;
+      --border: #444441;
+      --danger-bg: #3a1a1a;
+      --danger-text: #f09595;
+      --success-bg: #0a2e24;
+      --success-text: #9fe1cb;
+    }
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: var(--font); background: var(--bg-primary); color: var(--text-primary); padding: 2rem; max-width: 800px; margin: 0 auto; }
+  h1 { font-size: 22px; font-weight: 500; margin-bottom: 0.5rem; }
+  .subtitle { font-size: 13px; color: var(--text-secondary); margin-bottom: 1.5rem; line-height: 1.6; }
+  .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 1.5rem; }
+  .compare-card { background: var(--bg-primary); border: 0.5px solid var(--border); border-radius: 12px; padding: 1.25rem; }
+  .badge { font-size: 12px; font-weight: 500; margin-bottom: 8px; }
+  .badge-danger { color: var(--danger-text); }
+  .badge-success { color: var(--success-text); }
+  .div-name { font-size: 20px; font-weight: 500; margin-bottom: 4px; }
+  .big-number { font-size: 28px; font-weight: 500; }
+  .detail { font-size: 13px; color: var(--text-secondary); margin-top: 8px; }
+  .insight { background: var(--bg-secondary); border-radius: 8px; padding: 1rem; margin-bottom: 1.5rem; }
+  .insight-title { font-size: 14px; font-weight: 500; margin-bottom: 8px; }
+  .insight-text { font-size: 14px; color: var(--text-secondary); line-height: 1.7; }
+  .insight-text strong { color: var(--text-primary); font-weight: 500; }
+  .legend { display: flex; flex-wrap: wrap; gap: 16px; margin-bottom: 8px; font-size: 12px; color: var(--text-secondary); }
+  .legend span { display: flex; align-items: center; gap: 4px; }
+  .legend-dot { width: 10px; height: 10px; border-radius: 2px; }
+  .chart-wrap { position: relative; width: 100%; height: 280px; }
+  .source { font-size: 11px; color: var(--text-secondary); margin-top: 1.5rem; padding-top: 1rem; border-top: 0.5px solid var(--border); }
+</style>
+</head>
+<body>
+
+<h1>Which division is the biggest emitter?</h1>
+<p class="subtitle">Scope 1+2 greenhouse gas emissions comparison — data from Microsoft Fabric Emissions Data Agent.</p>
+
+<div class="compare">
+  <div class="compare-card">
+    <div class="badge badge-danger">BIGGEST EMITTER</div>
+    <div class="div-name">Powertrain &amp; Chassis</div>
+    <div class="big-number">4,183 kt CO₂e</div>
+    <div class="detail">Scope 1+2 | 39.7% of total portfolio emissions</div>
+  </div>
+  <div class="compare-card">
+    <div class="badge badge-success">SMALLEST EMITTER</div>
+    <div class="div-name">Vehicle Lifetime Solutions</div>
+    <div class="big-number">1,125 kt CO₂e</div>
+    <div class="detail">Scope 1+2 | 10.7% of total portfolio emissions</div>
+  </div>
+</div>
+
+<div class="insight">
+  <div class="insight-title">Key comparison</div>
+  <div class="insight-text">
+    Powertrain &amp; Chassis emits <strong>3.7× more</strong> CO₂ than Vehicle Lifetime Solutions — but also generates <strong>2.9× more revenue</strong>. This means it is not just larger, it is also more emissions-intensive per euro earned.
+  </div>
+</div>
+
+<div class="legend">
+  <span><span class="legend-dot" style="background:#534AB7"></span>Powertrain & Chassis 4,183 kt</span>
+  <span><span class="legend-dot" style="background:#185FA5"></span>Bearings & Industrial 2,337 kt</span>
+  <span><span class="legend-dot" style="background:#BA7517"></span>E-Mobility 2,822 kt</span>
+  <span><span class="legend-dot" style="background:#0F6E56"></span>Vehicle Lifetime Sol. 1,125 kt</span>
+</div>
+
+<div class="chart-wrap">
+  <canvas id="emChart"></canvas>
+</div>
+
+<p class="source">Source: Fabric Emissions Data Agent | AI-Powered Sustainability Analytics Demo | Generated via Conversational AI</p>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+const gridC = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)';
+const tickC = isDark ? '#9c9a92' : '#73726c';
+
+new Chart(document.getElementById('emChart'), {
+  type: 'bar',
+  data: {
+    labels: ['Powertrain & Chassis', 'E-Mobility', 'Bearings & Industrial', 'Vehicle Lifetime Sol.'],
+    datasets: [{
+      label: 'Emissions (kt CO₂e)',
+      data: [4183, 2822, 2337, 1125],
+      backgroundColor: ['#534AB7', '#BA7517', '#185FA5', '#0F6E56'],
+      borderRadius: 6,
+      barPercentage: 0.7
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        callbacks: {
+          label: function(ctx) {
+            return ctx.parsed.y.toLocaleString() + ' kt CO₂e';
+          }
+        }
+      }
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        grid: { color: gridC },
+        ticks: {
+          color: tickC,
+          callback: function(v) { return v.toLocaleString() + ' kt'; }
+        }
+      },
+      x: {
+        grid: { display: false },
+        ticks: { color: tickC, maxRotation: 0 }
+      }
+    }
+  }
+});
+</script>
+
+</body>
+</html>

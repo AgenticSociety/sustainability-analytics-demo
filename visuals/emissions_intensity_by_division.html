@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Emissions Intensity by Division</title>
+<style>
+  :root {
+    --bg-primary: #ffffff;
+    --bg-secondary: #f5f5f3;
+    --text-primary: #2c2c2a;
+    --text-secondary: #73726c;
+    --border: #e0ded6;
+    --danger-bg: #fcebeb;
+    --danger-text: #a32d2d;
+    --success-bg: #e1f5ee;
+    --success-text: #085041;
+    --info-bg: #e6f1fb;
+    --info-text: #0c447c;
+    --warning-bg: #faeeda;
+    --warning-text: #633806;
+    --font: "Segoe UI", system-ui, -apple-system, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg-primary: #1a1a18;
+      --bg-secondary: #2c2c2a;
+      --text-primary: #e0ded6;
+      --text-secondary: #9c9a92;
+      --border: #444441;
+      --danger-bg: #3a1a1a;
+      --danger-text: #f09595;
+      --success-bg: #0a2e24;
+      --success-text: #9fe1cb;
+      --info-bg: #0a2a45;
+      --info-text: #85b7eb;
+      --warning-bg: #3a2a0a;
+      --warning-text: #fac775;
+    }
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: var(--font); background: var(--bg-primary); color: var(--text-primary); padding: 2rem; max-width: 800px; margin: 0 auto; }
+  h1 { font-size: 22px; font-weight: 500; margin-bottom: 0.5rem; }
+  .subtitle { font-size: 13px; color: var(--text-secondary); margin-bottom: 1.5rem; line-height: 1.6; }
+  .subtitle strong { color: var(--text-primary); font-weight: 500; }
+  .method { background: var(--bg-secondary); border-radius: 8px; padding: 1rem; margin-bottom: 1.5rem; font-size: 13px; color: var(--text-secondary); line-height: 1.7; }
+  .method strong { color: var(--text-primary); font-weight: 500; }
+  .method .agent-rev { color: var(--info-text); font-weight: 500; }
+  .method .agent-em { color: var(--warning-text); font-weight: 500; }
+  .cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 1.5rem; }
+  .card { background: var(--bg-primary); border: 0.5px solid var(--border); border-radius: 12px; padding: 1rem; text-align: center; }
+  .card-label { font-size: 12px; color: var(--text-secondary); margin-bottom: 6px; }
+  .card-value { font-size: 26px; font-weight: 500; }
+  .card-unit { font-size: 11px; color: var(--text-secondary); }
+  .card-badge { margin-top: 8px; font-size: 11px; padding: 3px 8px; border-radius: 8px; display: inline-block; }
+  .badge-danger { background: var(--danger-bg); color: var(--danger-text); }
+  .badge-success { background: var(--success-bg); color: var(--success-text); }
+  .val-high { color: #D85A30; }
+  .val-mid { color: #BA7517; }
+  .val-low { color: #0F6E56; }
+  .legend { display: flex; flex-wrap: wrap; gap: 16px; margin-bottom: 8px; font-size: 12px; color: var(--text-secondary); }
+  .legend span { display: flex; align-items: center; gap: 4px; }
+  .legend-dot { width: 10px; height: 10px; border-radius: 2px; }
+  .chart-wrap { position: relative; width: 100%; height: 260px; }
+  .source { font-size: 11px; color: var(--text-secondary); margin-top: 1.5rem; padding-top: 1rem; border-top: 0.5px solid var(--border); }
+</style>
+</head>
+<body>
+
+<h1>Emissions intensity by revenue</h1>
+<p class="subtitle">Tonnes CO₂e per €1M revenue — lower is better. A derived metric that exists in neither source dataset.</p>
+
+<div class="method">
+  <strong>Emissions intensity</strong> = tonnes CO₂e per €1M revenue. Computed live by combining
+  <span class="agent-rev">Revenue Agent</span> +
+  <span class="agent-em">Emissions Agent</span> — this metric is calculated in real-time by the AI, not stored in any database.
+</div>
+
+<div class="cards">
+  <div class="card">
+    <div class="card-label">E-Mobility</div>
+    <div class="card-value val-high">563</div>
+    <div class="card-unit">t CO₂e / €M</div>
+    <div class="card-badge badge-danger">Highest</div>
+  </div>
+  <div class="card">
+    <div class="card-label">Powertrain &amp; Chassis</div>
+    <div class="card-value val-mid">470</div>
+    <div class="card-unit">t CO₂e / €M</div>
+  </div>
+  <div class="card">
+    <div class="card-label">Vehicle Lifetime Sol.</div>
+    <div class="card-value val-low">370</div>
+    <div class="card-unit">t CO₂e / €M</div>
+  </div>
+  <div class="card">
+    <div class="card-label">Bearings &amp; Industrial</div>
+    <div class="card-value val-low">367</div>
+    <div class="card-unit">t CO₂e / €M</div>
+    <div class="card-badge badge-success">Lowest</div>
+  </div>
+</div>
+
+<div class="legend">
+  <span><span class="legend-dot" style="background:#BA7517"></span>E-Mobility 563 t/€M</span>
+  <span><span class="legend-dot" style="background:#534AB7"></span>Powertrain & Chassis 470 t/€M</span>
+  <span><span class="legend-dot" style="background:#0F6E56"></span>Vehicle Lifetime Sol. 370 t/€M</span>
+  <span><span class="legend-dot" style="background:#185FA5"></span>Bearings & Industrial 367 t/€M</span>
+</div>
+
+<div class="chart-wrap">
+  <canvas id="intChart"></canvas>
+</div>
+
+<p class="source">Source: Fabric Revenue Agent + Fabric Emissions Agent | AI-Powered Sustainability Analytics Demo | Generated via Conversational AI</p>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+const gridC = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)';
+const tickC = isDark ? '#9c9a92' : '#73726c';
+const dashC = isDark ? 'rgba(255,255,255,0.25)' : 'rgba(0,0,0,0.2)';
+
+const divisions = ['E-Mobility', 'Powertrain & Chassis', 'Vehicle Lifetime Sol.', 'Bearings & Industrial'];
+const intensity = [563, 470, 370, 367];
+const revenue = [5015, 8900, 3038, 6368];
+const emissions = [2822, 4183, 1125, 2337];
+const barColors = ['#BA7517', '#534AB7', '#0F6E56', '#185FA5'];
+
+const totalEmis = emissions.reduce((a, b) => a + b, 0);
+const totalRev = revenue.reduce((a, b) => a + b, 0);
+const avgIntensity = Math.round(totalEmis / totalRev * 1000);
+
+new Chart(document.getElementById('intChart'), {
+  type: 'bar',
+  data: {
+    labels: divisions,
+    datasets: [{
+      data: intensity,
+      backgroundColor: barColors.map(c => c + '99'),
+      borderColor: barColors,
+      borderWidth: 1.5,
+      borderRadius: 6,
+      barPercentage: 0.65
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    indexAxis: 'y',
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        callbacks: {
+          label: function(ctx) {
+            const i = ctx.dataIndex;
+            return [
+              intensity[i] + ' t CO\u2082e per \u20ACM revenue',
+              'Revenue: \u20AC' + revenue[i].toLocaleString() + 'M',
+              'Emissions: ' + emissions[i].toLocaleString() + ' kt CO\u2082e'
+            ];
+          }
+        }
+      }
+    },
+    scales: {
+      x: {
+        beginAtZero: true,
+        max: 650,
+        grid: { color: gridC },
+        ticks: {
+          color: tickC,
+          callback: function(v) { return v + ' t'; }
+        },
+        title: {
+          display: true,
+          text: 't CO\u2082e per \u20ACM revenue (lower is better)',
+          color: tickC,
+          font: { size: 12 }
+        }
+      },
+      y: {
+        grid: { display: false },
+        ticks: { color: tickC }
+      }
+    }
+  },
+  plugins: [{
+    id: 'avgLine',
+    afterDraw: function(chart) {
+      var ctx = chart.ctx;
+      var x = chart.scales.x;
+      var y = chart.scales.y;
+      var xPos = x.getPixelForValue(avgIntensity);
+      ctx.save();
+      ctx.setLineDash([6, 4]);
+      ctx.strokeStyle = dashC;
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(xPos, y.top);
+      ctx.lineTo(xPos, y.bottom);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.font = '400 11px "Segoe UI", system-ui, sans-serif';
+      ctx.fillStyle = tickC;
+      ctx.textAlign = 'center';
+      ctx.fillText('Portfolio avg: ' + avgIntensity + ' t/\u20ACM', xPos, y.top - 6);
+      ctx.restore();
+    }
+  }]
+});
+</script>
+
+</body>
+</html>
